@@ -3,7 +3,7 @@
 #include <windows.h>
 
 bool key_state[256] = {false}; // array to track key states
-char key_char = '';
+char key_char = ' ';
 
 void hideConsole(){
     // get the console window handle
