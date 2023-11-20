@@ -1,4 +1,3 @@
 [autorun]
 icon=online.ico
-label=Keylogger
-action=Click “OK” to start your apps!
+label=This has a Keylogger
